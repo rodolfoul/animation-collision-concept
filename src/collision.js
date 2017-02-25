@@ -1,65 +1,103 @@
-function touchesCanvas(circle) {
-	let touches = [];
-	if (circle.pos.x - circle.radius < 0) {
-		touches.push("LEFT");
-	} else if (circle.pos.x + circle.radius > canvas.width) {
-		touches.push("RIGHT");
+GeneralCollision = {
+	accountForCollisions: function (circles) {
+		CanvasCollision.accountForCollisions(circles);
+		CircleCollision.accountForCollisions(circles);
 	}
+};
 
-	if (circle.pos.y - circle.radius < 0) {
-		touches.push("UP");
-	} else if (circle.pos.y + circle.radius > canvas.height) {
-		touches.push("DOWN");
-	}
-	return touches;
-}
+CanvasCollision = {
+	accountForCollisions: function (circles) {
+		for (circle of circles) {
+			let canvasTouches = this.touchesCanvas(circle);
+			if (canvasTouches.length > 0) {
+				this.repositionAfterTouch(circle, canvasTouches);
+			}
+		}
+	},
 
-function repositionAfterSchock(circle, canvasTouches) {
-	let dt = 0;
-	let touch = canvasTouches.shift();
-	let definitiveTouch;
-	while (touch) {
-		let t;
-		if (touch == "LEFT") {
-			t = (circle.radius - circle.pos.x) / circle.speed.x;
-		} else if (touch == "RIGHT") {
-			t = (canvas.width - circle.radius - circle.pos.x) / circle.speed.x;
-		} else if (touch == "DOWN") {
-			t = (canvas.height - circle.radius - circle.pos.y) / circle.speed.y;
-		} else if (touch == "UP") {
-			t = (circle.radius - circle.pos.y) / circle.speed.y;
+	touchesCanvas: function (circle) {
+		let touches = [];
+		if (circle.pos.x - circle.radius < 0) {
+			touches.push("LEFT");
+		} else if (circle.pos.x + circle.radius > canvas.width) {
+			touches.push("RIGHT");
 		}
 
-		if (t < dt) {
-			dt = t;
-			definitiveTouch = touch;
-		} else if (t == dt) {
-			definitiveTouch = [definitiveTouch, touch];
+		if (circle.pos.y - circle.radius < 0) {
+			touches.push("UP");
+		} else if (circle.pos.y + circle.radius > canvas.height) {
+			touches.push("DOWN");
+		}
+		return touches;
+	},
+
+	repositionAfterTouch: function (circle, canvasTouches) {
+		let dt = 0;
+		let touch = canvasTouches.shift();
+		let definitiveTouch;
+		while (touch) {
+			let t;
+			if (touch == "LEFT") {
+				t = (circle.radius - circle.pos.x) / circle.speed.x;
+			} else if (touch == "RIGHT") {
+				t = (canvas.width - circle.radius - circle.pos.x) / circle.speed.x;
+			} else if (touch == "DOWN") {
+				t = (canvas.height - circle.radius - circle.pos.y) / circle.speed.y;
+			} else if (touch == "UP") {
+				t = (circle.radius - circle.pos.y) / circle.speed.y;
+			}
+
+			if (t < dt) {
+				dt = t;
+				definitiveTouch = touch;
+			} else if (t == dt) {
+				definitiveTouch = [definitiveTouch, touch];
+			}
+
+			touch = canvasTouches.shift();
 		}
 
-		touch = canvasTouches.shift();
+		circle.positionAfterT(dt);
+
+		if (Array.isArray(definitiveTouch)) {
+			circle.speed.x = -circle.speed.x;
+			circle.speed.y = -circle.speed.y;
+		} else if (definitiveTouch == "LEFT" || definitiveTouch == "RIGHT") {
+			circle.speed.x = -circle.speed.x;
+		} else if (definitiveTouch == "UP" || definitiveTouch == "DOWN") {
+			circle.speed.y = -circle.speed.y;
+		}
+
+		circle.positionAfterT(-dt);
+
+		canvasTouches = this.touchesCanvas(circle);
+		if (canvasTouches.length > 0) {
+			this.repositionAfterTouch(circle, canvasTouches);
+		}
 	}
-
-	circle.positionAfterT(dt);
-
-	if (Array.isArray(definitiveTouch)) {
-		circle.speed.x = -circle.speed.x;
-		circle.speed.y = -circle.speed.y;
-	} else if (definitiveTouch == "LEFT" || definitiveTouch == "RIGHT") {
-		circle.speed.x = -circle.speed.x;
-	} else if (definitiveTouch == "UP" || definitiveTouch == "DOWN") {
-		circle.speed.y = -circle.speed.y;
-	}
-
-	circle.positionAfterT(-dt);
-
-	canvasTouches = touchesCanvas(circle);
-	if (canvasTouches.length > 0) {
-		repositionAfterSchock(circle, canvasTouches);
-	}
-}
+};
 
 CircleCollision = {
+	accountForCollisions: function (circles) {
+		circles = circles.slice(0);
+
+		let collisions = [];
+		while (circles.length >= 2) {
+			let circle = circles.shift();
+
+			for (c of circles) {
+				if (this.touches(circle, c)) {
+					collisions.push([c, circle]);
+				}
+			}
+		}
+
+		if (collisions.length > 0) {
+			this.repositionAfterTouch(collisions);
+		}
+	},
+
+
 	touches: function (c1, c2) {
 		let touchingDistance = c1.radius + c2.radius;
 
@@ -77,42 +115,27 @@ CircleCollision = {
 		return touchingDistance > Math.sqrt(xDistance * xDistance + yDistance * yDistance);
 	},
 
-	checkColisions: function (circles) {
-		circles = circles.slice(0);
+	calcTouchingDt: function (c1, c2) {
+//d^2 = (x1-x2)^2 + (y1-y2)^2
+		let dvx = c1.speed.x - c2.speed.x;
+		let dvy = c1.speed.y - c2.speed.y;
+		let dx0 = c1.pos.x - c2.pos.x;
+		let dy0 = c1.pos.y - c2.pos.y;
+		let d = c1.radius + c2.radius;
 
-		let collisions = [];
-		while (circles.length >= 2) {
-			let circle = circles.shift();
-
-			for (c of circles) {
-				if (this.touches(circle, c)) {
-					collisions.push([c, circle]);
-				}
-			}
-		}
-
-		if (collisions.length > 0) {
-			this.repositionAfterSchock(collisions);
-		}
+		return -(1 / (dvx ** 2 + dvy ** 2)) * (dvx * dx0 + dvy * dy0 +
+			Math.sqrt((dvx * dx0 + dvy * dy0) ** 2 +
+				(dvx ** 2 + dvy ** 2) * (d ** 2 - dx0 ** 2 - dy0 ** 2)));
 	},
 
-	repositionAfterSchock(collisions) {
+	repositionAfterTouch(collisions) {
 		let dt = 0;
 
 		let collidingCircles = new Set();
 
 		let deepTouchingCircles;
 		for (let [c1, c2] of collisions) {
-			//d^2 = (x1-x2)^2 + (y1-y2)^2
-			let dvx = c1.speed.x - c2.speed.x;
-			let dvy = c1.speed.y - c2.speed.y;
-			let dx0 = c1.pos.x - c2.pos.x;
-			let dy0 = c1.pos.y - c2.pos.y;
-			let d = c1.radius + c2.radius;
-
-			let thisDt = -(1 / (dvx ** 2 + dvy ** 2)) * (dvx * dx0 + dvy * dy0 +
-				Math.sqrt((dvx * dx0 + dvy * dy0) ** 2 +
-					(dvx ** 2 + dvy ** 2) * (d ** 2 - dx0 ** 2 - dy0 ** 2)));
+			let thisDt = this.calcTouchingDt(c1, c2);
 
 			if (thisDt < dt) {
 				dt = thisDt;
@@ -163,14 +186,3 @@ CircleCollision = {
 		c2.speed.y = v2Ort * Math.cos(thetaH1) + v2HitF * Math.sin(thetaH1);
 	}
 };
-
-function shockAccounting(circles, currentTime) {
-	for (circle of circles) {
-		let canvasTouches = touchesCanvas(circle);
-		if (canvasTouches.length > 0) {
-			repositionAfterSchock(circle, canvasTouches);
-		}
-	}
-
-	CircleCollision.checkColisions(circles);
-}

@@ -3,28 +3,42 @@ function reset() {
 	updateTotalEnergy();
 }
 
-function toggleGravity() {
-	if (gravity == 0) {
-		gravity = 700;
-	} else {
-		gravity = 0;
+function setGravity(direction) {
+	let gravityModule = 700;
+
+	if (typeof (direction) == "string") {
+		if (direction == "UP") {
+			gravity = new Point(0, -gravityModule);
+		} else if (direction == "DOWN") {
+			gravity = new Point(0, gravityModule);
+		} else if (direction == "LEFT") {
+			gravity = new Point(-gravityModule, 0);
+		} else if (direction == "RIGHT") {
+			gravity = new Point(gravityModule, 0);
+		} else if (direction == "NONE") {
+			gravity = new Point(0, 0);
+		}
+
+	} else if (direction instanceof Point) {
+		gravity = direction;
 	}
+
 	for (c of polygons) {
-		c.accel.y = gravity;
+		c.accel = gravity;
 	}
 }
 
 function updateTotalEnergy() {
-	systemEnergy = 0;
+	let systemEnergy = new Big(0);
 	for (c of polygons) {
-		systemEnergy += c.radius ** 2 * (c.speed.x ** 2 + c.speed.y ** 2);
+		systemEnergy = systemEnergy.plus(new Big(c.radius ** 2 * (c.speed.x ** 2 + c.speed.y ** 2)));
 	}
 
-	$('#totalEnergy').text((systemEnergy / 1000).toLocaleString('fr-FR', {maximumFractionDigits: 2}));
+	$('#totalEnergy').text(systemEnergy.div(1000).toFixed(2));
 }
 
 function randomCircle() {
-	let radius = randNm() * 10 + 25;
+	let radius = randNm() * 5 + 25;
 	if (radius <= 1) {
 		radius = 1;
 	}
@@ -32,12 +46,12 @@ function randomCircle() {
 		randomRange(radius, canvas.height - radius));
 	let c = new Circle(position, radius);
 
-	const maxSpeed = 100;
+	const maxSpeed = 50;
 	c.speed.x = randomRange(-maxSpeed, maxSpeed);
 	c.speed.y = randomRange(-maxSpeed, maxSpeed);
-	c.accel.y = gravity;
+
+	c.accel = gravity;
 	polygons.push(c);
-	updateTotalEnergy();
 }
 
 function randNm() {

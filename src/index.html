@@ -4,19 +4,75 @@
 	<title>Schocking objects</title>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/bootstrap/3.3.7/css/bootstrap.min.css"
 	      integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous">
+	<style>
+		canvas {
+			border: 1px solid black;
+			/*display: inline-block;*/
+			/*margin: auto;*/
+			vertical-align: middle;
+		}
+
+		.center-button {
+			margin: auto;
+			display: block;
+		}
+
+		div.left-button, div.right-button {
+			width: 30px;
+		}
+
+		div.left-button > button {
+			transform: rotate(-90deg) translate(0, -26px);
+			white-space: nowrap;
+		}
+
+		div.right-button > button {
+			white-space: nowrap;
+			transform: rotate(90deg) translate(0, 32px);
+		}
+
+	</style>
 </head>
 <body>
 <h2>Check canvas:</h2>
 
-<canvas id="myCanvas" width="300" height="300" style="border:1px solid #000000;">
-</canvas>
-<br>
+<div>
+	<table>
+		<tr>
+			<td colspan="3">
+				<button class="center-button" onclick="setGravity('UP')">Gravity up</button>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div class="left-button">
+					<button onclick="setGravity('LEFT')">Gravity left</button>
+				</div>
+			</td>
+			<td>
+				<canvas id="myCanvas" width="300" height="300"></canvas>
+			</td>
+			<td>
+				<div class="right-button">
+					<button onclick="setGravity('RIGHT')">Gravity right</button>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="3">
+				<button class="center-button" onclick="setGravity('DOWN')">Gravity down</button>
+			</td>
+		</tr>
+	</table>
+</div>
 
+<button onclick="setGravity('NONE')">Remove gravity</button>
 <button onclick="randomCircle()">Random circle</button>
-<button onclick="toggleGravity()">Toggle gravity</button>
 <button onclick="reset()">Reset</button>
-<p>Total Energy: <span id="totalEnergy">0</span></p>
+<p>Total Kinect Energy: <span id="totalEnergy">0</span></p>
 
+<script src="https://cdn.jsdelivr.net/big.js/2.5.0/big.min.js"
+        integrity="sha256-/S1QQMEG5u+XZz0a81cCo/tK2mPP9noAhVdSQ62sjw8=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/jquery/3.1.1/jquery.min.js"
         integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
 <script src="classes.js"></script>

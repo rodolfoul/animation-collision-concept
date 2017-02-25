@@ -3,8 +3,8 @@ let ctx = canvas.getContext("2d");
 let polygons = [];
 let lastFrame;
 let mousePos = new Point(0, 0);
-let gravity = 0;
-let systemEnergy = 0;
+let gravity = new Point(0, 0);
+let updateFrameTime = 1000 / 60;
 
 document.getElementsByTagName("body")[0].addEventListener('mousemove', function (evt) {
 	mousePos = new Point(evt.clientX, evt.clientY);
@@ -23,13 +23,14 @@ function draw() {
 	for (polygon of polygons) {
 		polygon.positionAfterT(dt);
 	}
-	shockAccounting(polygons);
+	GeneralCollision.accountForCollisions(polygons);
 
 	for (polygon of polygons) {
 		polygon.draw(ctx);
 	}
 
 	drawMousePos();
+	updateTotalEnergy();
 }
 
 function drawMousePos() {
@@ -44,7 +45,7 @@ function drawMouseSpeed() {
 
 function startAnimation() {
 	setUp();
-	setInterval(draw, 1000 / 60);
+	setInterval(draw, updateFrameTime);
 }
 
 startAnimation();
