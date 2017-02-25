@@ -2,13 +2,26 @@
 <html>
 <head>
 	<title>Schocking objects</title>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/bootstrap/3.3.7/css/bootstrap.min.css"
+	      integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous">
 </head>
 <body>
 <h2>Check canvas:</h2>
 
 <canvas id="myCanvas" width="300" height="300" style="border:1px solid #000000;">
 </canvas>
+<br>
 
+<button onclick="randomCircle()">Random circle</button>
+<button onclick="toggleGravity()">Toggle gravity</button>
+<button onclick="reset()">Reset</button>
+<p>Total Energy: <span id="totalEnergy">0</span></p>
+
+<script src="https://cdn.jsdelivr.net/jquery/3.1.1/jquery.min.js"
+        integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+<script src="classes.js"></script>
+<script src="collision.js"></script>
+<script src="buttons.js"></script>
 <script src="main.js"></script>
 </body>
 </html>
