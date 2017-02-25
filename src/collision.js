@@ -1,8 +1,22 @@
-GeneralCollision = {
-	accountForCollisions: function (circles) {
+GeneralCollision = new function () {
+	this.toggleCollisions = function () {
+		if (this.accountForCollisions == this._accountForAllTypes) {
+			this.accountForCollisions = this._accountForCanvasOnly;
+		} else {
+			this.accountForCollisions = this._accountForAllTypes;
+		}
+	};
+
+	this._accountForAllTypes = function (circles) {
 		CanvasCollision.accountForCollisions(circles);
 		CircleCollision.accountForCollisions(circles);
-	}
+	};
+
+	this._accountForCanvasOnly = function (circles) {
+		CanvasCollision.accountForCollisions(circles);
+	};
+
+	this.accountForCollisions = this._accountForAllTypes;
 };
 
 CanvasCollision = {
@@ -30,8 +44,9 @@ CanvasCollision = {
 		}
 		return touches;
 	},
+	MAX_REPOSITIONS: 20,
 
-	repositionAfterTouch: function (circle, canvasTouches) {
+	repositionAfterTouch: function (circle, canvasTouches, repositionCount) {
 		let dt = 0;
 		let touch = canvasTouches.shift();
 		let definitiveTouch;
@@ -72,7 +87,15 @@ CanvasCollision = {
 
 		canvasTouches = this.touchesCanvas(circle);
 		if (canvasTouches.length > 0) {
-			this.repositionAfterTouch(circle, canvasTouches);
+			if (repositionCount == null) {
+				repositionCount = 1;
+			}
+
+			if (repositionCount < this.MAX_REPOSITIONS) {
+				this.repositionAfterTouch(circle, canvasTouches, repositionCount + 1);
+			} else {
+				console.info('Max repositions reached.')
+			}
 		}
 	}
 };

@@ -7,6 +7,14 @@ class Point {
 		this.y = y;
 	}
 
+	modulus() {
+		return Math.sqrt(this.x ** 2 + this.y ** 2);
+	}
+
+	minus(p) {
+		return new Point(this.x - p.x, this.y - p.y);
+	}
+
 	toString() {
 		return 'x:' + this.x + ', y:' + this.y;
 	}

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Schocking objects</title>
+	<title>Canvas Concept</title>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/bootstrap/3.3.7/css/bootstrap.min.css"
 	      integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous">
 	<style>
@@ -68,11 +68,12 @@
 
 <button onclick="setGravity('NONE')">Remove gravity</button>
 <button onclick="randomCircle()">Random circle</button>
+<button onclick="GeneralCollision.toggleCollisions()">Toggle Collisions</button>
 <button onclick="reset()">Reset</button>
-<p>Total Kinect Energy: <span id="totalEnergy">0</span></p>
+<p>Total Kinect Energy: <span id="kinectEnergy">0</span></p>
+<p>Total Potential Energy: <span id="potentialEnergy">0</span></p>
+<p>Total Energy: <span id="totalEnergy"></span></p>
 
-<script src="https://cdn.jsdelivr.net/big.js/2.5.0/big.min.js"
-        integrity="sha256-/S1QQMEG5u+XZz0a81cCo/tK2mPP9noAhVdSQ62sjw8=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/jquery/3.1.1/jquery.min.js"
         integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
 <script src="classes.js"></script>

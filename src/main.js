@@ -30,7 +30,7 @@ function draw() {
 	}
 
 	drawMousePos();
-	updateTotalEnergy();
+	updateEnergy();
 }
 
 function drawMousePos() {

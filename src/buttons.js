@@ -1,6 +1,6 @@
 function reset() {
 	polygons = [];
-	updateTotalEnergy();
+	updateEnergy();
 }
 
 function setGravity(direction) {
@@ -28,17 +28,33 @@ function setGravity(direction) {
 	}
 }
 
-function updateTotalEnergy() {
-	let systemEnergy = new Big(0);
-	for (c of polygons) {
-		systemEnergy = systemEnergy.plus(new Big(c.radius ** 2 * (c.speed.x ** 2 + c.speed.y ** 2)));
+function updateEnergy() {
+	let kinectEnergy = 0;
+	let potentialEnergy = 0;
+
+	let referencePos = new Point(0, 0);
+
+	if (gravity.y > 0) {
+		referencePos = new Point(0, canvas.height);
+	} else if (gravity.x > 0) {
+		referencePos = new Point(canvas.width, 0);
 	}
 
-	$('#totalEnergy').text(systemEnergy.div(1000).toFixed(2));
+	for (c of polygons) {
+		kinectEnergy += (c.radius ** 2 * (c.speed.x ** 2 + c.speed.y ** 2) / 2) / 1000000;
+
+		let nH = c.pos.minus(referencePos).minus(new Point(c.radius, c.radius));
+		let theta = Math.atan2(nH.y, nH.x) - Math.atan2(gravity.y, gravity.x);
+		potentialEnergy += (-(c.radius ** 2) * gravity.modulus() * nH.modulus() * Math.cos(theta)) / 1000000;
+	}
+
+	$('#kinectEnergy').text(kinectEnergy.toFixed(2));
+	$('#potentialEnergy').text(potentialEnergy.toFixed(2));
+	$('#totalEnergy').text((potentialEnergy + kinectEnergy).toFixed(2));
 }
 
 function randomCircle() {
-	let radius = randNm() * 5 + 25;
+	let radius = randNm() * 8 + 25;
 	if (radius <= 1) {
 		radius = 1;
 	}
@@ -46,7 +62,7 @@ function randomCircle() {
 		randomRange(radius, canvas.height - radius));
 	let c = new Circle(position, radius);
 
-	const maxSpeed = 50;
+	const maxSpeed = 100;
 	c.speed.x = randomRange(-maxSpeed, maxSpeed);
 	c.speed.y = randomRange(-maxSpeed, maxSpeed);
 
