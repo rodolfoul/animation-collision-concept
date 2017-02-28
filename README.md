@@ -23,5 +23,5 @@ Does collision change anything at all?
 - Supposing no attraction between molecules, we have an approximation model to how gas molecules 
 would behave at microscopic level.
 
-### Need something or got an implementation Suggestions?
+### Need something or have a suggestion?
 Feel free to contact me through issues page or directly through github.
