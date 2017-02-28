@@ -52,14 +52,19 @@ CanvasCollision = {
 		let definitiveTouch;
 		while (touch) {
 			let t;
-			if (touch == "LEFT") {
+			if (touch == "LEFT" && circle.speed.x < 0) {
 				t = (circle.radius - circle.pos.x) / circle.speed.x;
-			} else if (touch == "RIGHT") {
+			} else if (touch == "RIGHT" && circle.speed.x > 0) {
 				t = (canvas.width - circle.radius - circle.pos.x) / circle.speed.x;
-			} else if (touch == "DOWN") {
+			} else if (touch == "DOWN" && circle.speed.y > 0) {
 				t = (canvas.height - circle.radius - circle.pos.y) / circle.speed.y;
-			} else if (touch == "UP") {
+			} else if (touch == "UP" && circle.speed.y < 0) {
 				t = (circle.radius - circle.pos.y) / circle.speed.y;
+			}
+
+			if (t == null) {
+				console.warn("Collision happened with returning speed, returning");
+				return;
 			}
 
 			if (t < dt) {
@@ -72,17 +77,23 @@ CanvasCollision = {
 			touch = canvasTouches.shift();
 		}
 
+
 		circle.positionAfterT(dt);
 
-		if (Array.isArray(definitiveTouch)) {
-			circle.speed.x = -circle.speed.x;
-			circle.speed.y = -circle.speed.y;
-		} else if (definitiveTouch == "LEFT" || definitiveTouch == "RIGHT") {
-			circle.speed.x = -circle.speed.x;
-		} else if (definitiveTouch == "UP" || definitiveTouch == "DOWN") {
-			circle.speed.y = -circle.speed.y;
+		if (definitiveTouch == "LEFT") {
+			circle.speed.x = Math.abs(circle.speed.x);
+		} else if (definitiveTouch == "RIGHT") {
+			circle.speed.x = -Math.abs(circle.speed.x);
+		} else if (definitiveTouch == "UP") {
+			circle.speed.y = Math.abs(circle.speed.y);
+		} else if (definitiveTouch == "DOWN") {
+			circle.speed.y = -Math.abs(circle.speed.y);
 		}
 
+		if (Math.abs(dt) > updateFrameTime) {
+			console.warn("Last frame probably not processed correctly");
+			return;
+		}
 		circle.positionAfterT(-dt);
 
 		canvasTouches = this.touchesCanvas(circle);
