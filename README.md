@@ -20,3 +20,8 @@ Simple clone the project and double click index.html to run the application in y
 - Gravity vs no gravity shocks
 - What happens to energy on no gravity environments, what changes on once you add gravity to it.
 Does collision change anything at all?
+- Supposing no attraction between molecules, we have an approximation model to how gas molecules 
+would behave at microscopic level.
+
+### Need something or got an implementation Suggestions?
+Feel free to contact me through issues page or directly through github.
